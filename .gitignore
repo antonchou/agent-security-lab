@@ -28,3 +28,6 @@ reports/*.md
 .env
 .env.*
 !.env.example
+
+# Test fixtures under lab_fs must be tracked even though they look like .env files
+!lab_fs/**/.env.fake
