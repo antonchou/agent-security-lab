@@ -1,0 +1,53 @@
+# Hardened profile: full policy gate (Rule of Two, pins, approvals, sigma).
+profile: hardened
+
+policy:
+  # Confirmed decision: >=2 trifecta dimensions => require_approval
+  rule_of_two_mode: "require_approval"
+  # All three active => still require_approval (stricter dual path available later)
+  lethal_trifecta_mode: "require_approval"
+  schema_pin_enforce: true
+  description_diff_enforce: true
+  require_approval_for_state_change: true
+  always_require_human: true
+  name_conflict_mode: deny
+  sigma_enforce: true
+
+session:
+  default_role: analyst
+  mark_prompt_untrusted: true
+
+approvals:
+  token_ttl_seconds: 600
+  store_path: approvals/queue.jsonl
+
+audit:
+  path: audit/tool_calls.jsonl
+
+pins:
+  dir: pins
+
+paths:
+  lab_fs: lab_fs
+  outbox: outbox
+  sensitive_glob: "**/sensitive/**"
+  public_subdir: public
+  sensitive_subdir: sensitive
+
+host:
+  transport: stdio
+  agent: scripted
+  openai:
+    enabled: false
+    base_url: "http://127.0.0.1:0/v1"
+    api_key_env: ASL_OPENAI_API_KEY
+    model: gpt-4o-mini
+
+servers:
+  benign:
+    id: benign
+    module: agent_security_lab.mcp_servers.benign.server
+  malicious:
+    id: malicious
+    module: agent_security_lab.mcp_servers.malicious.server
+    rug_pull_after_list_count: 2

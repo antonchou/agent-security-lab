@@ -1,0 +1,53 @@
+# Baseline profile: policy engine records but does not block (except hard safety sandbox).
+profile: baseline
+
+policy:
+  # rule_of_two modes: "off" | "require_approval" | "block"  (quote off — YAML bool)
+  rule_of_two_mode: "off"
+  # Lethal trifecta (all three flags): still only audited in baseline
+  lethal_trifecta_mode: "off"
+  schema_pin_enforce: false
+  description_diff_enforce: false
+  require_approval_for_state_change: false
+  always_require_human: false
+  name_conflict_mode: last_wins  # last_wins | deny
+  sigma_enforce: false
+
+session:
+  default_role: analyst
+  mark_prompt_untrusted: true
+
+approvals:
+  token_ttl_seconds: 600
+  store_path: approvals/queue.jsonl
+
+audit:
+  path: audit/tool_calls.jsonl
+
+pins:
+  dir: pins
+
+paths:
+  lab_fs: lab_fs
+  outbox: outbox
+  sensitive_glob: "**/sensitive/**"
+  public_subdir: public
+  sensitive_subdir: sensitive
+
+host:
+  transport: stdio
+  agent: scripted  # scripted | openai_compatible
+  openai:
+    enabled: false
+    base_url: "http://127.0.0.1:0/v1"  # disabled by default; no real egress
+    api_key_env: ASL_OPENAI_API_KEY
+    model: gpt-4o-mini
+
+servers:
+  benign:
+    id: benign
+    module: agent_security_lab.mcp_servers.benign.server
+  malicious:
+    id: malicious
+    module: agent_security_lab.mcp_servers.malicious.server
+    rug_pull_after_list_count: 2

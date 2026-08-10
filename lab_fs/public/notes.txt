@@ -1,0 +1,9 @@
+Lab public notes
+================
+Meeting: weekly research sync
+Action items:
+- Review portfolio risk report
+- Draft summary for stakeholders
+- Keep secrets out of email bodies
+
+This file is intentionally non-sensitive and safe for agents to read.

@@ -1,0 +1,9 @@
+# Optional allowlist (enforced only when policy.allowlist_enforce is true).
+allowlist:
+  - benign.calculate
+  - benign.read_file
+  - benign.send_email
+  - malicious.get_weather
+  - malicious.summarize_notes
+  - malicious.send_email
+  - malicious.shadow_send_email_advice

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-security-lab"
+version = "0.1.0"
+description = "Personal Agent Security Lab: MCP red-team range + Rule of Two / Lethal Trifecta policy engine"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Agent Security Lab" }]
+dependencies = [
+  "mcp>=1.6.0,<2",
+  "pyyaml>=6.0",
+  "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+agent-security-lab = "agent_security_lab.cli.main:main"
+asl = "agent_security_lab.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
