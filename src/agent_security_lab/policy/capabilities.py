@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from agent_security_lab.config import LabConfig
 from agent_security_lab.models.intent import ToolCallIntent
@@ -18,7 +19,7 @@ STATE_CHANGE_TOOLS = {
 
 SENSITIVE_NAME_HINTS = re.compile(
     r"(sensitive|\.env|id_rsa|private.?key|customer_pii|secret|password)",
-    re.I,
+    re.IGNORECASE,
 )
 
 
@@ -55,7 +56,7 @@ def path_looks_sensitive(path: str, cfg: LabConfig) -> bool:
             return True
         except ValueError:
             pass
-    except Exception:  # noqa: BLE001
+    except Exception:  # noqa: BLE001, S110 — best-effort path check
         pass
     return False
 
@@ -82,9 +83,8 @@ def project_call_flags(
 
     # Sensitive data access
     for key in ("path", "file_path", "filepath"):
-        if key in args and args[key] is not None:
-            if path_looks_sensitive(str(args[key]), cfg):
-                flags.sensitive_data = True
+        if args.get(key) is not None and path_looks_sensitive(str(args[key]), cfg):
+            flags.sensitive_data = True
 
     # Body already carrying secrets implies sensitive handling
     for key in ("body", "content", "message"):
@@ -109,13 +109,10 @@ def project_call_flags(
 def role_allows(role: str, call_flags: TrifectaFlags) -> tuple[bool, str | None]:
     """Hard role matrix (inspired by ai-quant-platform can_execute_orders)."""
     r = role.lower()
-    if r == "observer":
-        if call_flags.sensitive_data or call_flags.state_change:
-            return False, f"role_observer_forbids:{call_flags.active_names()}"
-    if r == "analyst":
-        if call_flags.state_change:
-            return False, "role_analyst_forbids_state_change"
-        # sensitive allowed only with approval path (engine handles)
+    if r == "observer" and (call_flags.sensitive_data or call_flags.state_change):
+        return False, f"role_observer_forbids:{call_flags.active_names()}"
+    if r == "analyst" and call_flags.state_change:
+        return False, "role_analyst_forbids_state_change"
     # operator: allowed subject to rule-of-two / approval
     return True, None
 

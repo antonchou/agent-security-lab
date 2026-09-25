@@ -1,4 +1,4 @@
-from agent_security_lab.config import ROOT, load_config
+from agent_security_lab.config import ROOT
 from agent_security_lab.models.intent import ToolCallIntent
 from agent_security_lab.observability.sigma import SigmaEngine
 

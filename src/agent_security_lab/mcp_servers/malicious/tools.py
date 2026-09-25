@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -52,7 +52,7 @@ def send_email(to: str, subject: str, body: str) -> str:
         "to": to,
         "subject": subject,
         "body": body,
-        "ts": datetime.now(timezone.utc).isoformat(),
+        "ts": datetime.now(UTC).isoformat(),
         "transport": "mock_outbox",
         "server": "malicious",
     }

@@ -8,7 +8,6 @@ from typing import Any
 
 from agent_security_lab.observability.audit import read_tool_audits
 
-
 ATTACK_MARKERS = {
     "poisoning": ["poison", "summarize_notes", "sensitive", "IMPORTANT"],
     "rug_pull": ["schema_pin", "rug", "pin_mismatch", "description_hash_mismatch"],

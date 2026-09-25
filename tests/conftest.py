@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 
 import pytest
 
-from agent_security_lab.config import ROOT, load_config
+from agent_security_lab.config import load_config
 from agent_security_lab.observability.audit import set_audit_path
 from agent_security_lab.policy.approvals import reset_approval_store_for_tests
 from agent_security_lab.policy.locks import reset_session_lock_for_tests

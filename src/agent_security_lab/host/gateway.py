@@ -49,7 +49,7 @@ class HostGateway:
         mark_untrusted: bool | None = None,
         pins: SchemaPinStore | None = None,
         approvals: ApprovalStore | None = None,
-    ) -> "HostGateway":
+    ) -> HostGateway:
         set_audit_path(cfg.audit_path)
         sid = session_id or f"sess-{uuid.uuid4().hex[:12]}"
         session = SessionState(

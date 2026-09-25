@@ -11,11 +11,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent_security_lab.config import load_config  # noqa: E402
-from agent_security_lab.host.client import MCPClientManager  # noqa: E402
-from agent_security_lab.host.gateway import HostGateway  # noqa: E402
-from agent_security_lab.policy.approvals import ApprovalStore  # noqa: E402
-from agent_security_lab.policy.schema_pin import SchemaPinStore  # noqa: E402
+from agent_security_lab.config import load_config
+from agent_security_lab.host.client import MCPClientManager
+from agent_security_lab.host.gateway import HostGateway
+from agent_security_lab.policy.approvals import ApprovalStore
+from agent_security_lab.policy.schema_pin import SchemaPinStore
 
 
 async def main(profile: str) -> int:

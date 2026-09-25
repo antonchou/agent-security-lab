@@ -1,3 +1,5 @@
+import dataclasses
+
 import pytest
 
 from agent_security_lab.models.intent import ToolCallIntent, intent_hash
@@ -20,7 +22,7 @@ def test_intent_frozen_and_hash_stable():
     )
     assert a.intent_hash == b.intent_hash
     assert intent_hash(a) == a.intent_hash
-    with pytest.raises(Exception):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         a.tool_name = "x"  # type: ignore[misc]
 
 

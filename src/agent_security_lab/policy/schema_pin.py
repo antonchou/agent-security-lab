@@ -75,7 +75,7 @@ class SchemaPinStore:
                     input_schema=data.get("input_schema") or {},
                 )
                 self._pins[self._key(rec.server_id, rec.tool_name)] = rec
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: BLE001, S112 — skip corrupt pin files
                 continue
 
     def get(self, server_id: str, tool_name: str) -> PinRecord | None:

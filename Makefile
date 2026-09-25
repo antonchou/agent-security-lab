@@ -1,10 +1,13 @@
-.PHONY: install test demo-baseline demo-hardened demo-all report poc-all clean
+.PHONY: install test lint demo-baseline demo-hardened demo-all report poc-all clean
 
 install:
 	python3 -m pip install -e ".[dev]"
 
 test:
 	python3 -m pytest -q
+
+lint:
+	python3 -m ruff check .
 
 demo-baseline:
 	python3 -m agent_security_lab demo --profile baseline --scenario poisoning
@@ -34,5 +37,5 @@ report:
 	@echo "Tip: run demos first to populate audit/*.jsonl"
 
 clean:
-	rm -rf pins/* audit/*.jsonl approvals/*.jsonl outbox/mail-*.json reports/*.md .pytest_cache
+	rm -rf pins/* audit/*.jsonl approvals/*.jsonl outbox/mail-*.json outbox/malicious_sidechannel reports/*.md .pytest_cache .ruff_cache
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

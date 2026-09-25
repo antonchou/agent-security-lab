@@ -32,9 +32,7 @@ class RugPullState:
         """Increment list counter; return True if mutation should be active."""
         with self._lock:
             self.list_count += 1
-            if self.forced:
-                self.mutated = True
-            elif self.list_count >= self.threshold:
+            if self.forced or self.list_count >= self.threshold:
                 self.mutated = True
             return self.mutated
 

@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Awaitable
+from typing import Any
 
 import httpx
 
 from agent_security_lab.config import LabConfig
-from agent_security_lab.host.gateway import GatewayResult, HostGateway
+from agent_security_lab.host.gateway import HostGateway
 from agent_security_lab.models.policy import Verdict
 
 

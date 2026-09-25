@@ -8,7 +8,7 @@ from typing import Any
 from agent_security_lab.config import LabConfig
 from agent_security_lab.models.intent import ToolCallIntent
 from agent_security_lab.models.policy import PolicyDecision, Verdict
-from agent_security_lab.models.session import SessionState, TrifectaFlags
+from agent_security_lab.models.session import SessionState
 from agent_security_lab.observability.sigma import SigmaEngine
 from agent_security_lab.policy.approvals import ApprovalStore, get_approval_store
 from agent_security_lab.policy.capabilities import project_call_flags, role_allows

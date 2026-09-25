@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -38,7 +37,7 @@ class SigmaEngine:
         self.rules = rules or []
 
     @classmethod
-    def from_yaml(cls, path: Path) -> "SigmaEngine":
+    def from_yaml(cls, path: Path) -> SigmaEngine:
         if not path.exists():
             return cls([])
         data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -46,7 +45,7 @@ class SigmaEngine:
         for raw in data.get("rules") or []:
             match = raw.get("match") or {}
             patterns = [
-                re.compile(p, re.I) for p in (match.get("patterns") or [])
+                re.compile(p, re.IGNORECASE) for p in (match.get("patterns") or [])
             ]
             rules.append(
                 SigmaRule(

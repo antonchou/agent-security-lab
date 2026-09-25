@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import threading
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +41,7 @@ def write_tool_audit(
     path: Path | None = None,
 ) -> dict[str, Any]:
     record: dict[str, Any] = {
-        "ts": datetime.now(timezone.utc).isoformat(),
+        "ts": datetime.now(UTC).isoformat(),
         "event": event,
         "source": source,
         "session_id": session_id,
@@ -55,9 +55,8 @@ def write_tool_audit(
         "extra": extra or {},
     }
     line = json.dumps(record, default=str, ensure_ascii=False)
-    with _LOCK:
-        with audit_path(path).open("a", encoding="utf-8") as f:
-            f.write(line + "\n")
+    with _LOCK, audit_path(path).open("a", encoding="utf-8") as f:
+        f.write(line + "\n")
     return record
 
 

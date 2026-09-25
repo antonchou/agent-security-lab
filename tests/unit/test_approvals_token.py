@@ -1,7 +1,7 @@
 import pytest
 
-from agent_security_lab.models.intent import ToolCallIntent
 from agent_security_lab.models.approval import ApprovalStatus
+from agent_security_lab.models.intent import ToolCallIntent
 from agent_security_lab.policy.approvals import ApprovalStore
 
 

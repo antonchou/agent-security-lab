@@ -10,9 +10,8 @@ import json
 import secrets
 import threading
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 from agent_security_lab.config import LabConfig, load_config
 from agent_security_lab.models.approval import (
@@ -22,7 +21,7 @@ from agent_security_lab.models.approval import (
 )
 from agent_security_lab.models.intent import ToolCallIntent
 
-_STORE: "ApprovalStore | None" = None
+_STORE: ApprovalStore | None = None
 
 
 class ApprovalStore:
@@ -83,7 +82,7 @@ class ApprovalStore:
                 raise KeyError(approval_id)
             if item.status is not ApprovalStatus.PENDING:
                 raise ValueError(f"cannot decide approval in status={item.status}")
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             if approve:
                 item.status = ApprovalStatus.APPROVED
                 token_str = secrets.token_urlsafe(32)
@@ -117,7 +116,7 @@ class ApprovalStore:
                 raise ValueError("invalid_execution_token")
             if tok.used:
                 raise ValueError("execution_token_already_used")
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             if tok.expires_at is not None and now > tok.expires_at:
                 raise ValueError("execution_token_expired")
             if tok.intent_hash != intent_hash:
@@ -147,7 +146,7 @@ class ApprovalStore:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             with self.path.open("a", encoding="utf-8") as f:
                 f.write(json.dumps(item.to_dict(), default=str) + "\n")
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001, S110 — persistence must not break the flow
             pass
 
 

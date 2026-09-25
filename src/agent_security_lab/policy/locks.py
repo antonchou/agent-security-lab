@@ -6,10 +6,9 @@ Risk check + execution must hold the same lock to prevent TOCTOU races.
 from __future__ import annotations
 
 import threading
-import time
 import uuid
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
 
 _LOCAL_LOCKS: dict[str, threading.Lock] = {}
 _LOCAL_META = threading.Lock()

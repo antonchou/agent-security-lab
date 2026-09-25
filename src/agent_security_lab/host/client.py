@@ -117,7 +117,7 @@ class MCPClientManager:
         cands = self.bare_index.get(name, [])
         if not cands:
             # try with any server prefix match
-            for ns, rt in self.tools.items():
+            for ns in self.tools:
                 if ns.endswith(f".{name}"):
                     cands.append(ns)
         if not cands:

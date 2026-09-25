@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import shutil
 import sys
 from pathlib import Path
 
-from agent_security_lab.config import ROOT, LabConfig, load_config
+from agent_security_lab.cli.demo_scenarios import (
+    scenario_benign_happy_path,
+    scenario_rug_pull,
+    scenario_tool_poisoning,
+    scenario_tool_shadowing,
+)
+from agent_security_lab.config import ROOT, load_config
 from agent_security_lab.host.agent_loop import ScriptedAgent
 from agent_security_lab.host.client import MCPClientManager
 from agent_security_lab.host.gateway import HostGateway
@@ -17,12 +22,6 @@ from agent_security_lab.observability.audit import set_audit_path
 from agent_security_lab.observability.report import build_comparison_report
 from agent_security_lab.policy.approvals import get_approval_store, reset_approval_store_for_tests
 from agent_security_lab.policy.schema_pin import SchemaPinStore
-from agent_security_lab.cli.demo_scenarios import (
-    scenario_benign_happy_path,
-    scenario_rug_pull,
-    scenario_tool_poisoning,
-    scenario_tool_shadowing,
-)
 
 
 def _banner() -> None:
@@ -177,7 +176,6 @@ def cmd_report(args: argparse.Namespace) -> int:
 
 
 async def cmd_list_tools(profile: str) -> int:
-    cfg = load_config(profile)
     client = MCPClientManager()
     await client.start()
     try:

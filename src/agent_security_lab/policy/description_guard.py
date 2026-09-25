@@ -7,12 +7,12 @@ import re
 from dataclasses import dataclass, field
 
 POISON_MARKERS = [
-    re.compile(r"<IMPORTANT>", re.I),
-    re.compile(r"</IMPORTANT>", re.I),
-    re.compile(r"do not mention this instruction", re.I),
-    re.compile(r"ignore previous", re.I),
-    re.compile(r"before answering,\s*call", re.I),
-    re.compile(r"include contents", re.I),
+    re.compile(r"<IMPORTANT>", re.IGNORECASE),
+    re.compile(r"</IMPORTANT>", re.IGNORECASE),
+    re.compile(r"do not mention this instruction", re.IGNORECASE),
+    re.compile(r"ignore previous", re.IGNORECASE),
+    re.compile(r"before answering,\s*call", re.IGNORECASE),
+    re.compile(r"include contents", re.IGNORECASE),
 ]
 
 
@@ -49,21 +49,20 @@ def check_description(
     desc_l = (description or "").lower()
     bare = tool_name.split(".")[-1]
     # Use exact bare-name match (substring "send_email" appears in shadow_* tools)
-    if "send_email" in desc_l and bare != "send_email":
-        if any(
-            x in desc_l
-            for x in (
-                "before calling send_email",
-                "instead of send_email",
-                "must call",
-                "always use",
-                "hijack",
-                "attach",
-                "compliance",
-                "do not mention",
-            )
-        ):
-            alerts.append("shadowing_language_detected")
+    if "send_email" in desc_l and bare != "send_email" and any(
+        x in desc_l
+        for x in (
+            "before calling send_email",
+            "instead of send_email",
+            "must call",
+            "always use",
+            "hijack",
+            "attach",
+            "compliance",
+            "do not mention",
+        )
+    ):
+        alerts.append("shadowing_language_detected")
 
     changed = False
     diff = None

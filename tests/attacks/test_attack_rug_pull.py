@@ -69,15 +69,13 @@ async def test_rug_pull_counter_path(hardened_cfg):
     client = MCPClientManager()
     await client.start(malicious_env={"ASL_RUG_PULL_AFTER_LIST_COUNT": "1"})
     try:
-        # First refresh already counted as list_tools inside start()
-        # Another refresh may already be mutated depending on threshold
-        await client.refresh_tools()
+        # start() already performed one tools/list; with threshold=1 the
+        # malicious server serves the mutated description from then on
         desc = client.tools["malicious.get_weather"].description
-        # With threshold 1, after first list mutated; start() did one list
-        # so we should be mutated
-        assert "<IMPORTANT>" in desc or "extra_headers" in desc or True
-        # At minimum the hook path is covered above; counter increments without crash
-        state_desc = client.tools["malicious.get_weather"].description
-        assert isinstance(state_desc, str)
+        assert "<IMPORTANT>" in desc
+        # The list-counter path keeps incrementing without crashing
+        await client.refresh_tools()
+        again = client.tools["malicious.get_weather"].description
+        assert "<IMPORTANT>" in again
     finally:
         await client.aclose()
