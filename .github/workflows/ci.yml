@@ -16,7 +16,9 @@ jobs:
       - name: Install ruff
         run: python -m pip install "ruff>=0.16,<1"
       - name: Lint
-        run: ruff check .
+        run: |
+          python -m ruff --version
+          python -m ruff check . --output-format github
 
   test:
     runs-on: ${{ matrix.os }}

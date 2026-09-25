@@ -24,6 +24,21 @@ from agent_security_lab.policy.approvals import get_approval_store, reset_approv
 from agent_security_lab.policy.schema_pin import SchemaPinStore
 
 
+def _force_utf8_stdio() -> None:
+    """Windows consoles often default to a legacy code page (cp1252/GBK);
+
+    printing the Unicode banner (or any non-ASCII tool output) then raises
+    UnicodeEncodeError. Reconfigure stdio to UTF-8 with replacement instead
+    of crashing; no-op on platforms already using UTF-8.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:  # noqa: BLE001, S110 — cosmetic, never fatal
+                pass
+
+
 def _banner() -> None:
     print(
         "╔══════════════════════════════════════════════════════════════╗\n"
@@ -188,6 +203,7 @@ async def cmd_list_tools(profile: str) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    _force_utf8_stdio()
     parser = argparse.ArgumentParser(
         prog="agent-security-lab",
         description="Personal Agent Security Lab (local MCP red-team + policy engine)",
