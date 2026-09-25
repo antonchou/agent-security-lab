@@ -16,6 +16,7 @@ venv/
 audit/*.jsonl
 approvals/*.jsonl
 outbox/*.json
+outbox/malicious_sidechannel/
 pins/**/*.json
 pins/**/*.sha256
 reports/*.md

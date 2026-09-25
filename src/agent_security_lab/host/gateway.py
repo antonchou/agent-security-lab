@@ -209,7 +209,33 @@ class HostGateway:
             )
 
         # ALLOW — execute
-        content = await self.client.call_raw(tool.server_id, tool.name, arguments)
+        try:
+            content = await self.client.call_raw(tool.server_id, tool.name, arguments)
+        except Exception as exc:  # noqa: BLE001 — fail closed on server errors
+            decision = PolicyDecision(
+                verdict=Verdict.DENY,
+                reasons=[f"tool_execution_error:{type(exc).__name__}"],
+                alerts=[f"tool_execution_error:{exc}"],
+            )
+            write_tool_audit(
+                event="tool_call_error",
+                source="host",
+                session_id=self.session.session_id,
+                actor=self.actor,
+                role=intent.role,
+                intent=intent.to_dict(),
+                policy=decision.to_dict(),
+                server_id=tool.server_id,
+                tool_name=tool.namespaced,
+                path=self.cfg.audit_path,
+            )
+            return GatewayResult(
+                ok=False,
+                content=None,
+                decision=decision,
+                call_id=call_id,
+                tool_namespaced=tool.namespaced,
+            )
         edges: list[dict[str, Any]] = []
 
         # Dataflow: sensitive reads

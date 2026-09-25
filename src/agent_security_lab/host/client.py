@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from contextlib import AsyncExitStack
 from dataclasses import dataclass, field
@@ -42,13 +43,11 @@ class MCPClientManager:
     bare_index: dict[str, list[str]] = field(default_factory=dict)
 
     def _server_params(self, module: str, env: dict[str, str] | None = None) -> StdioServerParameters:
-        import os
-
         full_env = os.environ.copy()
-        # Ensure src is importable
+        # Ensure src is importable; os.pathsep is ';' on Windows, ':' elsewhere
         pp = full_env.get("PYTHONPATH", "")
         src = str(ROOT / "src")
-        full_env["PYTHONPATH"] = src if not pp else f"{src}:{pp}"
+        full_env["PYTHONPATH"] = src if not pp else f"{src}{os.pathsep}{pp}"
         if env:
             full_env.update(env)
         return StdioServerParameters(

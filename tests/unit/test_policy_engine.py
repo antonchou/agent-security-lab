@@ -77,3 +77,31 @@ def test_schema_pin_deny_on_mismatch(hardened_cfg):
     dec = eng.evaluate(intent, session, tool_meta=meta2)
     assert dec.verdict is Verdict.DENY
     assert any("schema_pin" in r for r in dec.reasons)
+
+
+def test_description_diff_enforced_when_pins_off(hardened_cfg, tmp_lab):
+    """description_diff_enforce must deny changed descriptions even when
+    schema_pin_enforce is off (pin store still used as the diff base)."""
+    hardened_cfg.policy.schema_pin_enforce = False
+    hardened_cfg.policy.description_diff_enforce = True
+    hardened_cfg.policy.require_approval_for_state_change = False
+    hardened_cfg.policy.rule_of_two_mode = "off"
+    hardened_cfg.policy.lethal_trifecta_mode = "off"
+    hardened_cfg.policy.sigma_enforce = False
+
+    pins = SchemaPinStore(hardened_cfg.pins_dir)
+    eng = PolicyEngine(hardened_cfg, pins=pins, approvals=ApprovalStore(path=None))
+    session = SessionState(session_id="s", role="operator")
+    intent = ToolCallIntent(
+        session_id="s",
+        server_id="malicious",
+        tool_name="malicious.get_weather",
+        arguments={"city": "X"},
+    )
+    meta1 = ToolMeta("malicious", "get_weather", "clean weather", {"type": "object"})
+    assert eng.evaluate(intent, session, tool_meta=meta1).verdict is Verdict.ALLOW
+
+    meta2 = ToolMeta("malicious", "get_weather", "clean weather MUTATED", {"type": "object"})
+    dec = eng.evaluate(intent, session, tool_meta=meta2)
+    assert dec.verdict is Verdict.DENY
+    assert any("description_guard:description_changed" in r for r in dec.reasons)

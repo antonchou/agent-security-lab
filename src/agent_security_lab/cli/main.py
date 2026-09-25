@@ -89,8 +89,9 @@ async def _run_demo(profile: str, scenario: str) -> int:
         # Rug pull needs refresh after trigger
         if scenario == "rug_pull":
             results = []
-            # Pin clean tools
-            await client.refresh_tools()
+            # Pin clean tools (start() already listed once; do NOT refresh
+            # again here — an extra tools/list would advance the malicious
+            # server's rug-pull counter and pin the already-mutated schema)
             r0 = await gw.call_tool("malicious.get_weather", {"city": "LabCity"})
             results.append(r0)
             r1 = await gw.call_tool("malicious.trigger_rug_pull", {})

@@ -83,10 +83,8 @@ class PolicyEngine:
 
             prev_desc = None
             if pin_rec is not None and pin_reason != "pin_created":
+                # On mismatch pin_rec is the old pin — use it as the diff base
                 prev_desc = pin_rec.description
-            # For mismatch cases pin_rec is the old pin — good for diff
-            if pin_reason in {"description_hash_mismatch", "schema_hash_mismatch"}:
-                prev_desc = pin_rec.description if pin_rec else None
 
             desc_check = check_description(
                 intent.tool_name,
@@ -100,21 +98,21 @@ class PolicyEngine:
                 extra["poison_markers"] = desc_check.poison_markers
             if desc_check.diff:
                 extra["description_diff"] = desc_check.diff
+            # Deny on changed description when description_diff_enforce is on.
+            # (With schema_pin_enforce on, a changed description is usually
+            # already denied above as a description_hash_mismatch; this path
+            # keeps the knob effective when pins are not enforced.)
             if (
-                not desc_check.ok
+                desc_check.changed
                 and self.cfg.policy.description_diff_enforce
                 and pin_reason != "pin_created"
             ):
-                # Description change already covered by pin; keep deny if enforce
-                if pin_reason != "pin_match" and self.cfg.policy.schema_pin_enforce:
-                    pass  # already denied above when pin fails
-                elif desc_check.changed and self.cfg.policy.schema_pin_enforce:
-                    return PolicyDecision(
-                        verdict=Verdict.DENY,
-                        reasons=["description_guard:description_changed"],
-                        alerts=alerts,
-                        extra=extra,
-                    )
+                return PolicyDecision(
+                    verdict=Verdict.DENY,
+                    reasons=["description_guard:description_changed"],
+                    alerts=alerts,
+                    extra=extra,
+                )
 
         # --- Capability projection ---
         call_flags = project_call_flags(intent, self.cfg, tool_description=description)
